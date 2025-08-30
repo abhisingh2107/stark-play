@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>StarkPlay | Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: #111;
+      border-bottom: 1px solid #444;
+    }
+
+    .navbar .left h1 {
+      margin: 0;
+    }
+
+    .navbar .right a,
+    .navbar .right button {
+      color: white;
+      text-decoration: none;
+      margin-left: 10px;
+      padding: 7px 14px;
+      background-color: #5c27fe;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* Tabs sections */
+    .section {
+      display: none;
+      padding: 20px 30px;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .tournament-card {
+      background-color: #1a1a1a;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .tournament-card img {
+      width: 150px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .tournament-details {
+      flex: 1;
+    }
+
+    .tournament-details h3 {
+      margin: 0 0 5px;
+      font-size: 16px;
+    }
+
+    .tournament-details p {
+      margin: 2px 0;
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    .tag {
+      display: inline-block;
+      background-color: #333;
+      color: #ccc;
+      padding: 3px 7px;
+      border-radius: 3px;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+
+    /* Bottom nav bar */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #111;
+      border-top: 1px solid #444;
+      display: none;
+      justify-content: space-around;
+      padding: 12px 0;
+      z-index: 1000;
+    }
+
+    #bottom-nav button {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 15px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    #bottom-nav button:hover,
+    #bottom-nav button.active {
+      color: #5c27fe;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <div class="navbar">
+    <div class="left">
+      <h1>StarkPlay</h1>
+    </div>
+    <div class="right" id="navbar-right">
+      <!-- Handled by JS -->
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div id="upcoming" class="section active">
+    <h2 style="color: #34d399;">Upcoming Tournaments</h2>
+    <div class="tournament-card">
+      <img src="https://i.imgur.com/Zw6X48b.jpeg" alt="Tournament Image">
+      <div class="tournament-details">
+        <h3>TEC LAN PARTY - St. Xavier's College</h3>
+        <p>📅 Sat 16th Aug 2025 • Registration Ends</p>
+        <p>🎁 Monster Energy Merch PrizePool</p>
+        <span class="tag">Tournament</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="history" class="section">
+    <h2 style="color: #f87171;">Your Tournament History</h2>
+    <p>No history data yet.</p>
+  </div>
+
+  <div id="dashboard" class="section">
+    <h2 style="color: #facc15;">Your Dashboard</h2>
+    <p>Wallet, stats, notifications will appear here.</p>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div id="bottom-nav">
+    <button onclick="switchTab('upcoming')" id="nav-upcoming">Upcoming</button>
+    <button onclick="switchTab('history')" id="nav-history">History</button>
+    <button onclick="switchTab('dashboard')" id="nav-dashboard">Dashboard</button>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+
+      // Bottom nav active state
+      document.querySelectorAll('#bottom-nav button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('nav-' + sectionId)?.classList.add('active');
+    }
+
+    function switchTab(section) {
+      showSection(section);
+    }
+
+    function updateNavbar() {
+      const navbarRight = document.getElementById('navbar-right');
+      const bottomNav = document.getElementById('bottom-nav');
+      const username = localStorage.getItem('username');
+
+      if (username) {
+        navbarRight.innerHTML = `
+          <span style="color:#fff;">Welcome, ${username}</span>
+          <button onclick="logout()">Logout</button>
+        `;
+        bottomNav.style.display = 'flex';
+      } else {
+        navbarRight.innerHTML = `
+          <a href="login.html">Login</a>
+          <a href="register.html">Signup</a>
+        `;
+        bottomNav.style.display = 'none';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('username');
+      updateNavbar();
+      showSection('upcoming');
+    }
+
+    // Initial setup
+    updateNavbar();
+    showSection('upcoming');
+  </script>
+
+</body>
+</html>

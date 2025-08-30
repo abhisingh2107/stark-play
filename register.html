@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register • STARK PLAY</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: url('bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: rgb(214, 204, 204);
+      position: relative;
+    }
+    .register-box {
+      background: rgba(228, 221, 221, 0.05);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #b8a40c;
+      border: 2px solid #f2f2ef;
+      backdrop-filter: blur(12px);
+      width: 350px;
+      text-align: center;
+      z-index: 1;
+    }
+    .register-box h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-shadow: 0 0 5px #080800;
+    }
+    .register-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #1c1c1c;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+    .register-box input:focus {
+      box-shadow: 0 0 8px #bfc234;
+    }
+    .register-box button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #f8f8f3;
+      color: black;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .register-box p {
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    .register-box a {
+      color: #1b1c01;
+      text-decoration: underline;
+    }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      backdrop-filter: blur(8px);
+      background: rgba(3, 0, 0, 0.5);
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="register-box">
+    <h2>REGISTER</h2>
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="Full Name (Aadhar Name)" required />
+      <input type="tel" id="mobile" placeholder="Mobile Number" maxlength="10" required />
+      <input type="text" id="bgmiId" placeholder="BGMI ID" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="password" id="password" placeholder="Create Password" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+      <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <!-- Firebase Modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBcU7bSc8hSHOckxjk2Ok8McUf7PZ_2H_4",
+      authDomain: "stark-play-with-champ.firebaseapp.com",
+      projectId: "stark-play-with-champ",
+      storageBucket: "stark-play-with-champ.appspot.com",
+      messagingSenderId: "375886659320",
+      appId: "1:375886659320:web:0bac0b424a7c9ef24ac50d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("registerForm");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = form.name.value.trim();
+      const mobile = form.mobile.value.trim();
+      const bgmiId = form.bgmiId.value.trim();
+      const email = form.email.value.trim();
+      const password = form.password.value;
+      const confirmPassword = form.confirmPassword.value;
+
+      if (password !== confirmPassword) {
+        alert("❌ Passwords do not match.");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save extra user info in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          name,
+          mobile,
+          bgmiId,
+          email,
+          createdAt: new Date().toISOString()
+        });
+
+        // Send email verification
+        await sendEmailVerification(user);
+
+        alert("✅ Registration successful! Please verify your email before logging in.");
+        form.reset();
+        window.location.href = "login.html";
+      } catch (error) {
+        alert("❌ Error: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
